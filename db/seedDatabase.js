@@ -7,10 +7,18 @@ async function seedDatabase() {
         const db = await getDatabase();
         const collection = db.collection('contact');
 
+        // Create a unique index on the email field to make it the primary key
+        await collection.createIndex({ email: 1 }, { unique: true });
+        console.log('Created unique index on email field');
+
         //Read the data.json file
         const dataPath = path.join(__dirname, '../data.json');
         const jsonData = fs.readFileSync(dataPath, 'utf8');
         const data = JSON.parse(jsonData);
+
+        // Clear existing data to avoid duplicates
+        await collection.deleteMany({});
+        console.log('Cleared existing data');
 
         // Insert the data into MongoDB
         const result = await collection.insertMany(data.contact);

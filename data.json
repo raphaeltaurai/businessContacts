@@ -1,7 +1,6 @@
 {
     "contact": [
         {
-            "id": 1,
             "firstName": "Raphael",
             "lastName": "Taurai",
             "email": "raphaeltaurai@gmail.com",
@@ -9,7 +8,6 @@
             "birthday": "1999-03-16"
         },
         {
-            "id": 2,
             "firstName": "Mitchell",
             "lastName": "Taurai",
             "email": "mitchelltaurai@gmail.com",
@@ -17,7 +15,6 @@
             "birthday": "2000-05-25"
         },
         {
-            "id": 3,
             "firstName": "Shanelle",
             "lastName": "Taurai",
             "email": "shanelletaurai@gmail.com",
