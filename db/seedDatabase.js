@@ -1,31 +1,26 @@
-const {MongoClient} = require('mongodb');
 const fs = require('fs');
 const path = require('path');
-require('dotenv').config();
+const { getDatabase, closeConnection } = require('./database');
 
-async function seedDatabase() => {
-  const client = new MongoClient(process.env.MONGODB_URI);
+async function seedDatabase() {
+    try {
+        const db = await getDatabase();
+        const collection = db.collection('contact');
 
-  try{
-    await client.connect();
-    console.log('connected to MongoDB');
+        //Read the data.json file
+        const dataPath = path.join(__dirname, '../data.json');
+        const jsonData = fs.readFileSync(dataPath, 'utf8');
+        const data = JSON.parse(jsonData);
 
-    const db = client.db(process.env.MONGODB_DB);
-    const collection = db.collection('contact');
-
-    //Read the data.json file
-    const dataPath = path.join(__dirname, '../data.json');
-    const jsonData = fs.readFileSync(dataPath, 'utf8');
-    const data = JSON.parse(jsonData);
-
-    //Insert the data into MongoDB
-    const result = await collection.insertOne(data);
-    console.log(`Inserted document with ID: ${result.insertedId}`);
-}
-  catch (error) {
-    console.error('Error seeding database:', error);}
-  finally {
-    await client.close();}
+        // Insert the data into MongoDB
+        const result = await collection.insertMany(data.contact);
+        console.log(`Inserted ${result.insertedCount} documents`);
+        
+    } catch (error) {
+        console.error('Error seeding database:', error);
+    } finally {
+        await closeConnection();
+    }
 }
 
 seedDatabase();
