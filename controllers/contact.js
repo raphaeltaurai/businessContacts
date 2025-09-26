@@ -1,6 +1,6 @@
 
 // Get all contacts
-async function getData(req, res, next) {
+async function getData(req, res) {
     try {
         const db = req.app.locals.db;
         const collection = db.collection('contact');
@@ -17,7 +17,7 @@ async function getData(req, res, next) {
 }
 
 // Get a specific contact by email
-async function getContactByEmail(req, res, next) {
+async function getContactByEmail(req, res) {
     try {
         const { email } = req.params;
         const db = req.app.locals.db;
@@ -37,7 +37,7 @@ async function getContactByEmail(req, res, next) {
 const { v4: uuidv4 } = require('uuid');
 
 // Create a new contact
-async function createContact(req, res, next) {
+async function createContact(req, res) {
     try {
         const { firstName, lastName, email, favoriteColor, birthday } = req.body;
         // Validate required fields
@@ -71,7 +71,7 @@ async function createContact(req, res, next) {
             favoriteColor,
             birthday
         };
-        const result = await collection.insertOne(newContact);
+        await collection.insertOne(newContact);
         res.status(201).json({ 
             message: 'Contact created successfully',
             contact: newContact
@@ -82,34 +82,35 @@ async function createContact(req, res, next) {
     }
 }
 
-// Update a contact by userId
-async function updateContact(req, res, next) {
+// Update a contact by email
+async function updateContact(req, res) {
     try {
-        const { userId } = req.params;
-        const { firstName, lastName, email, favoriteColor, birthday } = req.body;
+        const { email } = req.params;
+        const { firstName, lastName, favoriteColor, birthday } = req.body;
         const db = req.app.locals.db;
         const collection = db.collection('contact');
         // Check if contact exists
-        const existingContact = await collection.findOne({ userId });
+        const existingContact = await collection.findOne({ email });
         if (!existingContact) {
             return res.status(404).json({ message: 'Contact not found' });
         }
         // Update contact (email can be changed now)
         const updateData = {};
+        const { email: newEmail } = req.body;
         if (firstName !== undefined) updateData.firstName = firstName;
         if (lastName !== undefined) updateData.lastName = lastName;
-        if (email !== undefined) updateData.email = email;
+        if (newEmail !== undefined) updateData.email = newEmail;
         if (favoriteColor !== undefined) updateData.favoriteColor = favoriteColor;
         if (birthday !== undefined) updateData.birthday = birthday;
         const result = await collection.updateOne(
-            { userId },
+            { email },
             { $set: updateData }
         );
         if (result.modifiedCount === 0) {
             return res.status(400).json({ message: 'No changes made' });
         }
         // Get updated contact
-        const updatedContact = await collection.findOne({ userId });
+        const updatedContact = await collection.findOne({ email });
         res.status(200).json({ 
             message: 'Contact updated successfully',
             contact: updatedContact
@@ -121,7 +122,7 @@ async function updateContact(req, res, next) {
 }
 
 // Delete a contact by email
-async function deleteContact(req, res, next) {
+async function deleteContact(req, res) {
     try {
         const { email } = req.params;
         const db = req.app.locals.db;
