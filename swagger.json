@@ -8,7 +8,7 @@
   "host": "businesscontacts.onrender.com",
   "basePath": "/",
   "schemes": [
-    "http"
+    "https"
   ],
   "paths": {
     "/": {
